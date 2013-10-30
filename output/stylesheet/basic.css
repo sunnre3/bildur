@@ -1,0 +1,118 @@
+@charset "utf-8";
+
+body
+{
+	font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	line-height: 30px;
+	color: #333;
+}
+
+p
+{
+	margin: 0 0 13px;
+}
+
+h1
+{
+	font-size: 36.5px;
+}
+
+h2
+{
+	font-size: 29.5px;
+}
+
+h3
+{
+	font-size: 22.5px;
+}
+
+h4
+{
+	font-size: 16.5px;
+}
+
+h5
+{
+	font-size: 14px;
+}
+
+h6
+{
+	font-size: 12px;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+	color: inherit;
+	font-family: inherit;
+	font-weight: bold;
+	line-height: 20px;
+	margin: 10px 0;
+	text-rendering: optimizelegibility;
+}
+
+h1, h2, h3
+{
+	line-height: 40px;
+}
+
+strong
+{
+	font-weight: bold;
+}
+
+strike
+{
+	text-decoration: line-through;
+}
+
+em
+{
+	font-style: italic;
+}
+
+small
+{
+	font-size: 12px;
+}
+
+a
+{
+	color: #f04e37; /*749AB5*/
+	text-decoration: none;
+}
+
+a:hover
+{
+	text-decoration: underline;
+}
+
+*:focus
+{
+	outline: 0;
+}
+
+.unselectable
+{
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-o-user-select: none;
+}
+
+.hidden
+{
+	display: none;
+}
+
+.border-box
+{
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	-khtml-box-sizing: border-box;
+}
