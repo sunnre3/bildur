@@ -19,7 +19,7 @@ class Username {
 	public function __construct($_username) {
 		//First validate the username.
 		if(!$this->validate($_username))
-			throw new \Exception("Username::__construct() failed: Invalid username");
+			throw new \Exception('Username::__construct() failed: Invalid username');
 
 		//If it's a valid username then set it.
 		$this->username = $_username;
@@ -31,6 +31,17 @@ class Username {
 	 */
 	public function __toString() {
 		return $this->username;
+	}
+
+	/**
+	 * Verifies a username.
+	 * Returns true if it maches,
+	 * false if it doesn't.
+	 * @param  \user\model\username $username
+	 * @return boolean
+	 */
+	public function verify(\user\model\Username $username) {
+		return strtolower($this->username) == strtolower($username->username);
 	}
 
 	/**

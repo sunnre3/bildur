@@ -2,6 +2,9 @@
 
 namespace output\view;
 
+require_once('./login/model/Login.php');
+require_once('./login/model/LoginInfo.php');
+
 class HTMLPage {
 	/**
 	 * Page title
@@ -22,12 +25,21 @@ class HTMLPage {
 	private $script_array;
 
 	/**
+	 * LoginModel
+	 * @var \login\model\Login
+	 */
+	private $loginModel;
+
+	/**
 	 * @param \common\model\Stylesheet[] $stylesheets
 	 * @param \common\model\Script[] 	 $scripts
 	 */
 	public function __construct() {
 		//Add the standard styles and scripts.
 		$this->standard_stylesheet();
+
+		//Initiate loginModel;
+		$this->loginModel = new \login\model\Login();
 	}
 
 	/**
@@ -44,11 +56,11 @@ class HTMLPage {
 	 * @return void
 	 */
 	private function standard_stylesheet() {
-		$this->add_stylesheet("reset", "reset.css");
-		$this->add_stylesheet("fonts", "fonts.css");
-		$this->add_stylesheet("grid", "unsemantic-grid-responsive.css");
-		$this->add_stylesheet("basic", "basic.css");
-		$this->add_stylesheet("default", "default.css");
+		$this->add_stylesheet('reset', 'reset.css');
+		$this->add_stylesheet('fonts', 'fonts.css');
+		$this->add_stylesheet('basic', 'basic.css');
+		$this->add_stylesheet('default', 'default.css');
+		$this->add_stylesheet('grid', 'unsemantic-grid-responsive.css');
 	}
 
 	/**
@@ -58,7 +70,7 @@ class HTMLPage {
 	 */
 	private function add_stylesheet($identifier, $filename) {
 		if(isset($this->stylesheet_array[$identifier]))
-			throw new \Exception("add_stylesheet failed: need unique identifier");
+			throw new \Exception('add_stylesheet failed: need unique identifier');
 
 		$this->stylesheet_array[$identifier] = new \output\model\Stylesheet($identifier, $filename);
 	}
@@ -72,9 +84,9 @@ class HTMLPage {
 	 * @return void
 	 */
 	private function add_script(
-		$script_url = "",
+		$script_url = '',
 		$is_external = true,
-		$script_content = "") {
+		$script_content = '') {
 
 		$this->script_array[] = new \output\model\Script(
 			$script_url,
@@ -97,17 +109,34 @@ class HTMLPage {
 			}
 		}
 
+		if($this->loginModel->isLoggedIn()) {
+			$topbar = '
+				<a class="nav-btn" href="' . ROUTER_PREFIX . ROUTER_LOGOUT . '">Logga ut</a>
+				<a class="nav-btn" href="' . ROUTER_PREFIX . ROUTER_NEW_POST . '">Skapa nytt inlägg</a>';
+		}
+
+		else {
+			$topbar ='
+				<a class="nav-btn" href="' . ROUTER_PREFIX . ROUTER_LOGIN . '">Logga in</a>
+				<a class="nav-btn" href="' . ROUTER_PREFIX . ROUTER_REGISTER . '">Registrera</a>';
+		}
+
 		$str = "<!DOCTYPE html>
 <html>
 	<head>
-		<title>$this->page_title</title>
+		<title>{$this->page_title}</title>
 		<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">
 		$css
 	</head>
 
 	<body>
+		<div id=\"top-bar\">
+			{$topbar}
+		</div>
 		<div id=\"wrapper\" class=\"grid-container\">
-		";
+			<header id=\"main-header\">
+				<a href=\"./\"><h1>BILDUR</h1></a>
+			</header>";
 
 		return $str;
 	}

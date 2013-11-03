@@ -2,17 +2,17 @@
 
 namespace database\model;
 
-require_once("./database/model/Base.php");
-require_once("./user/model/Credentials.php");
+require_once('./database/model/Base.php');
+require_once('./user/model/User.php');
 
 class Setup extends Base {
-	private static $DEFAULT_ADMIN_USERNAME = "admin";
-	private static $DEFAULT_ADMIN_PASSWORD = "admin";
+	private static $DEFAULT_ADMIN_USERNAME = 'admin';
+	private static $DEFAULT_ADMIN_PASSWORD = 'admin';
 
 	public function clear() {
-		$this->executeQuery("drop table post;");
-		$this->executeQuery("drop table image;");
-		$this->executeQuery("drop table user;");
+		$this->executeQuery('drop table post;');
+		$this->executeQuery('drop table image;');
+		$this->executeQuery('drop table user;');
 	}
 
 	/**
@@ -28,10 +28,10 @@ class Setup extends Base {
 		$this->addTables();
 
 		//Add default values (admin etc).
-		$this->addDefaults();
+		$admin = $this->addDefaults();
 
 		//Add example posts
-		$this->addExamplePosts();
+		$this->addExamplePosts($admin);
 	}
 
 	/**
@@ -41,15 +41,30 @@ class Setup extends Base {
 	 */
 	private function addTables() {
 		try {
+			//Add our user table.
+			$this->executeQuery("
+				CREATE TABLE IF NOT EXISTS " . parent::$USER_TABLE_NAME . "
+				(
+					id int unsigned NOT NULL AUTO_INCREMENT,
+					username varchar(20) NOT NULL,
+					password varchar(255) NOT NULL,
+					PRIMARY KEY (id)
+				)
+			");
+
 			//Add our post table.
 			$this->executeQuery( "
 				CREATE TABLE IF NOT EXISTS " . parent::$POST_TABLE_NAME . "
 				(
-					id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-					user_id int NOT NULL, 
+					id int unsigned NOT NULL AUTO_INCREMENT,
+					user_id int unsigned NOT NULL, 
 					title varchar(50) NOT NULL,
 					datetime datetime NOT NULL,
-					content text
+					content text,
+					PRIMARY KEY (id),
+					FOREIGN KEY (user_id) REFERENCES user(id)
+						ON UPDATE CASCADE
+						ON DELETE CASCADE
 				)
 			");
 			
@@ -57,21 +72,17 @@ class Setup extends Base {
 			$this->executeQuery("
 				CREATE TABLE IF NOT EXISTS " . parent::$IMAGE_TABLE_NAME . "
 				(
-					id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-					post_id int NOT NULL,
+					id int unsigned NOT NULL AUTO_INCREMENT,
+					post_id int unsigned NOT NULL,
 					filepath varchar(100) NOT NULL,
-					title varchar(100) NOT NULL,
-					caption varchar(300)
-				)
-			");
+					thumbnail_filepath varchar(100) NOT NULL,
+					title varchar(100),
+					caption varchar(300),
+					PRIMARY KEY (id),
+					FOREIGN KEY (post_id) REFERENCES post(id)
+						ON UPDATE CASCADE
+						ON DELETE CASCADE
 
-			//Add our user table.
-			$this->executeQuery("
-				CREATE TABLE IF NOT EXISTS " . parent::$USER_TABLE_NAME . "
-				(
-					id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-					username varchar(20) NOT NULL,
-					password varchar(255) NOT NULL
 				)
 			");
 		}
@@ -90,16 +101,25 @@ class Setup extends Base {
 			//Get username and password for admin
 			//NOTE: This is where we might get password from front-end installer ui.
 
-			//Initiate UserCredentials object.
-			$uc = \user\model\Credentials::fromText(
+			//Initiate User object.
+			$user = \user\model\User::cleartext(
 				self::$DEFAULT_ADMIN_USERNAME,
 				self::$DEFAULT_ADMIN_PASSWORD);
+
+			//Get DB connection.
+			$mysqli = $this->getDBObject();
 
 			//Add admin to user table.
 			$this->executeQuery("
 				INSERT INTO " . parent::$USER_TABLE_NAME . " (username, password)
-				VALUES ('" . $uc->getUsername() . "','" . $uc->getPassword() . "')
-			");
+				VALUES ('{$user->getUsername()}','{$user->getPassword()}')
+			", $mysqli);
+
+			//Set userID.
+			$user->setId($mysqli->insert_id);
+
+			//Return user.
+			return $user;
 		}
 
 		catch(\Exception $e) {
@@ -112,21 +132,29 @@ class Setup extends Base {
 	 * some example posts to see how everything works.
 	 * @return void
 	 */
-	private function addExamplePosts() {
+	private function addExamplePosts(\user\model\User $user) {
 		try {
-			$adminID = 1;
-			date_default_timezone_set("Europe/Stockholm");
-			$time = date("Y-m-d H:i:s");
+			$adminID = $user->getId();
+			date_default_timezone_set('Europe/Stockholm');
+			$time = date('Y-m-d H:i:s');
 
-			$this->executeQuery("
-				INSERT INTO post (user_id, title, datetime, content)
-				VALUES ('".$adminID."','Hello World!','".$time."','Det här är ett testinlägg! Antingen redigera detta eller så tar du bort det.')
-			");
+			//Create 20 example posts for development purpose
+			for($i = 1; $i < 21; $i++) {
+				//Get the date (although unnecessary as we don't store microseconds).
+				$time = date("Y-m-d H:i:s");
 
-			 $this->executeQuery("
-			 	INSERT into image (post_id, title, caption)
-			 	VALUES (1, 'En bildtitel', 'En bildtext')
-			 ");
+				//Add the post.
+				$this->executeQuery("
+					INSERT INTO " . parent::$POST_TABLE_NAME . " (user_id, title, datetime, content)
+					VALUES ({$adminID},'Hello World!','{$time}','Det här är ett testinlägg! Antingen redigera detta eller så tar du bort det.')
+				");
+
+				//Then one image attached to it.
+				 $this->executeQuery("
+				 	INSERT into " . parent::$IMAGE_TABLE_NAME . " (post_id, filepath, thumbnail_filepath, title, caption)
+				 	VALUES ({$i}, '" . UPLOAD_PATH . "exempelbild.png', '" . UPLOAD_PATH . "exempelbild.png', 'En bildtitel', 'En bildtext')
+				 ");
+			}
 		}
 
 		catch(\Exception $e) {

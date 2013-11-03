@@ -3,19 +3,19 @@
 namespace database\model;
 
 abstract class Base {
-	protected static $POST_TABLE_NAME = "post";
-	protected static $IMAGE_TABLE_NAME = "image";
-	protected static $USER_TABLE_NAME = "user";
+	protected static $POST_TABLE_NAME = 'post';
+	protected static $IMAGE_TABLE_NAME = 'image';
+	protected static $USER_TABLE_NAME = 'user';
 
-	private static $DB_CONNECT_ERROR = "Error connecting to database";
-	private static $DB_CREATE_DATABASE_ERROR = "Error creating database";
+	private static $DB_CONNECT_ERROR = 'Error connecting to database';
+	private static $DB_CREATE_DATABASE_ERROR = 'Error creating database';
 
 	public function __construct() {
 		//Make sure that the database exists
 		//before anything else.
 		try {
 			$db = new \MySQLi(DB_HOST, DB_USER, DB_PW);
-			$query = "CREATE DATABASE IF NOT EXISTS " . DB_NAME;
+			$query = 'CREATE DATABASE IF NOT EXISTS ' . DB_NAME;
 			$this->executeQuery($query, $db);
 		}
 		catch(\Exception $e) {
@@ -84,7 +84,7 @@ abstract class Base {
 
 		//If the query fails we need to throw.
 		if(!$result)
-			throw new \Exception($conn->error . "\nFull query: [" . $query . "]");
+			throw new \Exception("{$conn->error} Full query: [{$query}");
 
 		//Return result.
 		return $result;
@@ -96,7 +96,7 @@ abstract class Base {
 	 * @return boolean
 	 */
 	protected function table_exists($table) {
-		$result = $this->executeQuery("SHOW TABLES LIKE '$table'");
+		$result = $this->executeQuery("SHOW TABLES LIKE '{$table}'");
 
 		if(!$result) {
 			return false;

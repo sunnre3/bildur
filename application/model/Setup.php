@@ -2,7 +2,7 @@
 
 namespace application\model;
 
-require_once("./database/model/Setup.php");
+require_once('./database/model/Setup.php');
 
 class Setup {
 	/**

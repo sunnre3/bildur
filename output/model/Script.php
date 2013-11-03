@@ -28,9 +28,9 @@ class Script {
 	 * @param string  $script_content script content
 	 */
 	public function __construct(
-		$_url = "",
+		$_url = '',
 		$_external = true,
-		$_content = "") {
+		$_content = '') {
 
 		$this->url = $_url;
 		$this->external = $_external;

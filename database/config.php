@@ -11,7 +11,7 @@
  * IS SAYING IS GOOD.
  */
 
-define("DB_HOST", "localhost");
-define("DB_USER", "root");
-define("DB_PW", "asd");
-define("DB_NAME", "bildur");
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PW', 'asd');
+define('DB_NAME', 'bildur');

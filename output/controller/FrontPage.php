@@ -2,9 +2,9 @@
 
 namespace output\controller;
 
-require_once("./post/model/PostDAL.php");
-require_once("./post/view/Post.php");
-require_once("./output/controller/IController.php");
+require_once('./post/model/PostDAL.php');
+require_once('./post/view/Post.php');
+require_once('./output/controller/IController.php');
 
 class FrontPage implements IController {
 	/**
@@ -28,14 +28,14 @@ class FrontPage implements IController {
 	private $postView;
 
 	/**
-	 * Iniate objects and populate the posts array.
+	 * Initiate objects.
 	 */
 	public function __construct() {
 		//Initiate DAL object.
 		$this->postsDAL = new \post\model\PostDAL();
 
-		//Get all posts.
-		$this->posts = $this->postsDAL->getPosts();
+		//Initiate the postView object.
+		$this->postView = new \post\view\Post();
 	}
 
 	/**
@@ -43,14 +43,15 @@ class FrontPage implements IController {
 	 * @return void
 	 */
 	public function run() {
-		//Initiate the postView object.
-		$this->postView = new \post\view\Post($this->posts);
-
-		//Development purposes.
-		//debug($this->posts);
+		//Get all posts.
+		$this->posts = $this->postsDAL->getPosts();
 	}
 
+	/**
+	 * Returns content required for the front page.
+	 * @return string HTML
+	 */
 	public function getContent() {
-		return $this->postView->getAll();
+		return $this->postView->getAll($this->posts);
 	}
 }

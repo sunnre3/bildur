@@ -10,6 +10,38 @@ class Post {
 	private $id, $user_id, $title, $datetime, $content;
 
 	/**
+	 * Creates a post object
+	 * @param int $id
+	 * @param int $user_id
+	 * @param string $title
+	 * @param datetime $datetime
+	 * @param string $content
+	 */
+	public function __construct($id, $user_id, $title, $datetime, $content) {
+		$this->setId($id);
+		$this->setUserId($user_id);
+		$this->setTitle($title);
+		$this->setDateTime($datetime);
+		$this->setContent($content);
+	}
+
+	/**
+	 * Alternative constructor for when
+	 * you need to ommit $id and $user_id.
+	 * @param  string $title
+	 * @param  datetime $datetime
+	 * @param  string $content
+	 * @return \post\model\Post
+	 */
+	public static function uploaded($title, $datetime, $content) {
+		//Create an instance.
+		$instance = new self(0, 0, $title, $datetime, $content);
+
+		//Return instance.
+		return $instance;
+	}
+
+	/**
 	 * Get method for property $id
 	 * @return int
 	 */
@@ -23,7 +55,7 @@ class Post {
 	 */
 	public function setId($value) {
 		if(!is_numeric($value))
-			throw new \Exception("Post::setId() failed: value is not numeric");
+			throw new \Exception('Post::setId() failed: value is not numeric');
 
 		$this->id = $value;
 	}
@@ -42,7 +74,7 @@ class Post {
 	 */
 	public function setUserId($value) {
 		if(!is_numeric($value))
-			throw new \Exception("Post::setUserId() failed: value is not numeric");
+			throw new \Exception('Post::setUserId() failed: value is not numeric');
 
 		$this->user_id = $value;
 	}
@@ -63,10 +95,10 @@ class Post {
 		$value = trim($value);
 
 		if(strlen($value) == 0)
-			throw new \Exception("Post::setTitle() failed: value is empty");
+			throw new \Exception('Post::setTitle() failed: value is empty');
 
 		if(strlen($value) > 50)
-			throw new \Exception("Post::setTitle() failed: value is too long");
+			throw new \Exception('Post::setTitle() failed: value is too long');
 
 		$this->title = $value;
 	}
@@ -93,7 +125,7 @@ class Post {
 	 */
 	public function getUNIXTime() {
 		$date = new \DateTime($this->datetime);
-		return $date->format("U");
+		return $date->format('U');
 	}
 
 	/**
@@ -110,21 +142,5 @@ class Post {
 	 */
 	public function setContent($value) {
 		$this->content = $value;
-	}
-
-	/**
-	 * Creates a post object
-	 * @param int $id
-	 * @param int $user_id
-	 * @param string $title
-	 * @param datetime $datetime
-	 * @param string $content
-	 */
-	public function __construct($id, $user_id, $title, $datetime, $content) {
-		$this->setId($id);
-		$this->setUserId($user_id);
-		$this->setTitle($title);
-		$this->setDateTime($datetime);
-		$this->setContent($content);
 	}
 }

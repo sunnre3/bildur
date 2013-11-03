@@ -4,12 +4,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('html_errors', 1);
 
-echo "<h3>DON'T FORGET TO REMOVE.</h3>";
-
 function debug($item) {
-	echo "<pre>";
+	echo '<pre>';
 	var_dump($item);
-	echo "</pre>";
+	echo '</pre>';
 }
 
 /**
@@ -30,12 +28,18 @@ function debug($item) {
  * CHANGE ANYTHING IN THIS FILE SO BEST LET IT BE.
  */
 
+define('BASE_PATH', realpath(dirname(__FILE__)) . '/' , true);
+define('STYLESHEET_PATH', 'output/' . 'stylesheet/');
+define('UPLOAD_PATH', 'uploads/');
 
-define("BASE_PATH", realpath(dirname(__FILE__)) . "/" , true);
-define("STYLESHEET_PATH", "output/" . "stylesheet/");
+//Set default timezone.
+date_default_timezone_set('Europe/Stockholm');
 
-require_once("./database/config.php");
-require_once("./application/controller/Application.php");
+require_once('./database/config.php');
+require_once('./application/default_router_values.php');
+require_once('./application/controller/Application.php');
+
+session_start();
 
 $appController = new \application\controller\Application();
 $appController->runApp();

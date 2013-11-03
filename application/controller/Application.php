@@ -2,11 +2,11 @@
 
 namespace application\controller;
 
-require_once("./application/model/Setup.php");
-require_once("./application/controller/Router.php");
-require_once("./output/model/Stylesheet.php");
-require_once("./output/model/Script.php");
-require_once("./output/view/HTMLPage.php");
+require_once('./application/model/Setup.php');
+require_once('./application/controller/Router.php');
+require_once('./output/model/Stylesheet.php');
+require_once('./output/model/Script.php');
+require_once('./output/view/HTMLPage.php');
 
 class Application {
 	/**
@@ -30,12 +30,6 @@ class Application {
 	public function __construct() {
 		//Create a Setup object
 		$this->setup = new \application\model\Setup();
-
-		//Create a Router object
-		$this->router = new \application\model\Router();
-
-		//Create a HTMLPage object
-		$this->htmlPage = new \output\view\HTMLPage();
 	}
 
 	/**
@@ -71,6 +65,12 @@ class Application {
 			//If it isn't, make sure it is.
 			$this->setup->setup();
 		}
+
+		//Create a Router object
+		$this->router = new \application\model\Router();
+
+		//Create a HTMLPage object
+		$this->htmlPage = new \output\view\HTMLPage();
 
 		//Get the controller and
 		//send it along.
