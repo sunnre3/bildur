@@ -2,6 +2,8 @@
 
 namespace comment\model;
 
+require_once('./common/Filter.php');
+
 class Comment {
 	/**
 	 * Private representation of all of the comments
@@ -133,6 +135,7 @@ class Comment {
 	public function setContent($value) {
 		if(strlen($value) < 1)
 			throw new \Exception('Comment::setContent() failed: value must be longer than 0');
-		$this->content = $value;
+
+		$this->content = \common\Filter::sanitize($value);
 	}
 }

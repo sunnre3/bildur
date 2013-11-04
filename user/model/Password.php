@@ -2,6 +2,8 @@
 
 namespace user\model;
 
+require_once('./common/Filter.php');
+
 class Password {
 	const MIN_LENGTH = 5;
 	const MAX_LENGTH = 30;
@@ -83,6 +85,6 @@ class Password {
 	 * @return boolean
 	 */
 	private static function validate($password) {
-		return !(strlen($password) < self::MIN_LENGTH || strlen($password) > self::MAX_LENGTH);
+		return !strlen($password) < self::MIN_LENGTH || strlen($password) > self::MAX_LENGTH || \common\Filter::hasTags($password);
 	}
 }

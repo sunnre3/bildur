@@ -2,6 +2,8 @@
 
 namespace post\model;
 
+require_once('./common/Filter.php');
+
 class Post {
 	/**
 	 * Private representations of all properties of a post
@@ -100,7 +102,7 @@ class Post {
 		if(strlen($value) > 50)
 			throw new \Exception('Post::setTitle() failed: value is too long');
 
-		$this->title = $value;
+		$this->title = \common\Filter::sanitize($value);
 	}
 
 	/**
@@ -141,6 +143,6 @@ class Post {
 	 * @param string $value
 	 */
 	public function setContent($value) {
-		$this->content = $value;
+		$this->content = \common\Filter::sanitize($value);
 	}
 }

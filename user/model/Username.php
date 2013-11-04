@@ -2,6 +2,8 @@
 
 namespace user\model;
 
+require_once('./common/Filter.php');
+
 class Username {
 	const MIN_LENGTH = 3;
 	const MAX_LENGTH = 20;
@@ -49,6 +51,6 @@ class Username {
 	 * @return boolean
 	 */
 	private function validate($username) {
-		return !(strlen($username) < self::MIN_LENGTH || strlen($username) > self::MAX_LENGTH);
+		return !strlen($username) < self::MIN_LENGTH || strlen($username) > self::MAX_LENGTH || \common\Filter::hasTags($username);
 	}
 }
