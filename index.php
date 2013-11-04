@@ -34,6 +34,7 @@ define('UPLOAD_PATH', 'uploads/');
 //Set default timezone.
 date_default_timezone_set('Europe/Stockholm');
 
+require_once('./lib/password.php');
 require_once('./database/config.php');
 require_once('./application/default_router_values.php');
 require_once('./application/controller/Application.php');

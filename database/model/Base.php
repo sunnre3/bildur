@@ -2,6 +2,8 @@
 
 namespace database\model;
 
+require_once('./database/config.php');
+
 abstract class Base {
 	protected static $POST_TABLE_NAME = 'post';
 	protected static $USER_TABLE_NAME = 'user';
@@ -20,7 +22,7 @@ abstract class Base {
 			$this->executeQuery($query, $db);
 		}
 		catch(\Exception $e) {
-			throw new \Exception(self::$DB_CREATE_DATABASE_ERROR);
+			throw new \Exception(self::$DB_CREATE_DATABASE_ERROR . $db->connect_error);
 		}
 	}
 
