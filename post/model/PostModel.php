@@ -6,7 +6,7 @@ require_once('./post/model/PostDAL.php');
 
 class PostModel {
 	/**
-	 * Able to query the database.
+	 * Able to query the database.	
 	 * @var \post\model\PostDAL
 	 */
 	private $postDAL;
@@ -16,6 +16,16 @@ class PostModel {
 	 */
 	public function __construct() {
 		$this->postDAL = new \post\model\PostDAL();
+	}
+
+	/**
+	 * Retrieves a post with a certain id
+	 * from our system.
+	 * @param  int $id
+	 * @return \post\model\Post
+	 */
+	public function getPost($id) {
+		return $this->postDAL->getPost($id);
 	}
 
 	/**
@@ -33,6 +43,17 @@ class PostModel {
 
 		//Finally we return the object.
 		return $post;
+	}
+
+	/**
+	 * This method updates an existing
+	 * post in our system.
+	 * @param  \post\model\Post $post
+	 * @return void
+	 */
+	public function updatePost(\post\model\Post $post) {
+		//Update in system.
+		$this->postDAL->updatePost($post);
 	}
 
 	/**

@@ -4,8 +4,9 @@ namespace database\model;
 
 abstract class Base {
 	protected static $POST_TABLE_NAME = 'post';
-	protected static $IMAGE_TABLE_NAME = 'image';
 	protected static $USER_TABLE_NAME = 'user';
+	protected static $IMAGE_TABLE_NAME = 'image';
+	protected static $COMMENT_TABLE_NAME = 'comment';
 
 	private static $DB_CONNECT_ERROR = 'Error connecting to database';
 	private static $DB_CREATE_DATABASE_ERROR = 'Error creating database';
@@ -32,6 +33,11 @@ abstract class Base {
 			return false;
 		}
 
+		elseif(!$this->table_exists(self::$USER_TABLE_NAME)) {
+			$db->close();
+			return false;
+		}
+
 		elseif(!$this->table_exists(self::$POST_TABLE_NAME)) {
 			$db->close();
 			return false;
@@ -42,7 +48,7 @@ abstract class Base {
 			return false;
 		}
 
-		elseif(!$this->table_exists(self::$USER_TABLE_NAME)) {
+		elseif(!$this->table_exists(self::$COMMENT_TABLE_NAME)) {
 			$db->close();
 			return false;
 		}

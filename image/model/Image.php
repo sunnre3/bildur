@@ -7,7 +7,7 @@ class Image {
 	 * Private representation of all properties of an Image object.
 	 * This will get extended with getters and setters.
 	 */
-	private $id, $post_id, $filepath, $thumbnail_filepath, $title, $caption;
+	private $id, $post_id, $filepath, $thumbnail_filepath;
 
 	/**
 	 * Constructor to create an Image object
@@ -18,25 +18,23 @@ class Image {
 	 * @param string $title
 	 * @param string $caption
 	 */
-	public function __construct($id, $post_id, $filepath, $thumbnail_filepath, $title, $caption) {
+	public function __construct($id, $post_id, $filepath, $thumbnail_filepath) {
 		$this->setId($id);
 		$this->setPostId($post_id);
 		$this->setFilePath($filepath);
 		$this->setThumbnail($thumbnail_filepath);
-		$this->setTitle($title);
-		$this->setCaption($caption);
 	}
 
 	/**
 	 * Alternative constructor for when you
 	 * can't supply $id and $post_id.
-	 * @param  [type] $filepath           [description]
-	 * @param  [type] $thumbnail_filepath [description]
-	 * @return [type]                     [description]
+	 * @param  string $filepath
+	 * @param  string $thumbnail_filepath
+	 * @return \image\model\Image
 	 */
-	public static function uploaded($filepath, $thumbnail_filepath) {
+	public static function __new($filepath, $thumbnail_filepath) {
 		//Create an instance.
-		$instance = new self(0, 0, $filepath, $thumbnail_filepath, "", "");
+		$instance = new self(0, 0, $filepath, $thumbnail_filepath);
 
 		//Return instance.
 		return $instance;
@@ -116,43 +114,5 @@ class Image {
 			throw new \Exception('Image::setThumbnail() failed: value is too long');
 
 		$this->thumbnail_filepath = $value;
-	}
-
-	/**
-	 * Get method for property $title
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
-
-	/**
-	 * Set method for property $title
-	 * @param string $value
-	 */
-	public function setTitle($value) {
-		if(strlen($value) > 100)
-			throw new \Exception('Image::setTitle() failed: value is too long');
-
-		$this->title = $value;
-	}
-
-	/**
-	 * Get method for property $caption
-	 * @return string
-	 */
-	public function getCaption() {
-		return $this->caption;
-	}
-
-	/**
-	 * Set method for property $caption
-	 * @param string $value
-	 */
-	public function setCaption($value) {
-		if(strlen($value) > 300)
-			throw new \Exception('Image::setCaption() failed: value is too long');
-
-		$this->caption = $value;
 	}
 }

@@ -15,14 +15,29 @@ class PostDAL extends \database\model\Base {
 		$mysqli = $this->getDBObject();
 
 		//MySQL query.
-		$query = 'INSERT INTO ' . parent::$POST_TABLE_NAME . ' (user_id, title, datetime, content)
-		VALUES(\'' . $post->getUserId() . '\', \'' . $post->getTitle() . '\', \'' . $post->getDateTime() . '\', \'' . $post->getContent() . '\')';
+		$query = "INSERT INTO " . parent::$POST_TABLE_NAME . " (user_id, title, datetime, content)
+		VALUES('{$post->getUserId()}', '{$post->getTitle()}', '{$post->getDateTime()}', '{$post->getContent()}')";
 
 		//Execute query.
 		$result = $this->executeQuery($query, $mysqli);
 
 		//Return the ID.
 		return $mysqli->insert_id;
+	}
+
+	/**
+	 * Updates a post in our database.
+	 * @param  \post\model\Post $post
+	 * @return void
+	 */
+	public function updatePost(\post\model\Post $post) {
+		//MySQL query.
+		$query = "UPDATE " . parent::$POST_TABLE_NAME .
+		" SET title='{$post->getTitle()}', datetime='{$post->getDateTime()}', content='{$post->getContent()}'
+		 WHERE id={$post->getId()}";
+
+		//Execute query.
+		$result = $this->executeQuery($query);
 	}
 
 	/**

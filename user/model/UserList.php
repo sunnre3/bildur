@@ -84,11 +84,35 @@ class UserList {
 		return true;
 	}
 
+	/**
+	 * Adds a User to our system.
+	 * @param  \user\model\User $new_user
+	 * @return \user\model\User
+	 */
 	public function addUser(\user\model\User $new_user) {
 		//Use our DAL to add the user to our database.
-		$this->userDAL->addUser($new_user);
+		$new_user = $this->userDAL->addUser($new_user);
 
 		//Add the user to our array.
 		$this->users[] = $new_user;
+
+		//Return the user.
+		return $new_user;
+	}
+
+	/**
+	 * Updates a user in our system.
+	 * @param  \user\model\User $user
+	 * @return void
+	 */
+	public function updateUser(\user\model\User $user) {
+		//Update with DAL.
+		$updated_user = $this->userDAL->updateUser($user);
+
+		//Get the key for the user in the array.
+		$key = array_search($user, $this->users, true);
+
+		//Replace the old with the new.
+		$this->users[$key] = $updated_user;
 	}
 }

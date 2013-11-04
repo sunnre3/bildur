@@ -136,7 +136,7 @@ class NewPost implements IController {
 
 				//Then we also want to show the
 				//user some kind of error message.
-				$this->postView->newPostFailed();
+				$this->postView->postFailed();
 			}
 		}
 	}

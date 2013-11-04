@@ -23,13 +23,12 @@ class Script {
 
 	/**
 	 * @param string  $script_url     URL to script file
-	 * @param string  $script_type    script type
 	 * @param boolean $is_external    if script is external
 	 * @param string  $script_content script content
 	 */
 	public function __construct(
 		$_url = '',
-		$_external = true,
+		$_external = false,
 		$_content = '') {
 
 		$this->url = $_url;

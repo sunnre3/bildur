@@ -35,8 +35,11 @@ class HTMLPage {
 	 * @param \common\model\Script[] 	 $scripts
 	 */
 	public function __construct() {
-		//Add the standard styles and scripts.
+		//Add the standard styles.
 		$this->standard_stylesheet();
+
+		//Add the standard scripts.
+		$this->standard_scripts();
 
 		//Initiate loginModel;
 		$this->loginModel = new \login\model\Login();
@@ -52,7 +55,7 @@ class HTMLPage {
 	}
 
 	/**
-	 * Adds standard necessary css
+	 * Adds standard necessary css.
 	 * @return void
 	 */
 	private function standard_stylesheet() {
@@ -61,6 +64,15 @@ class HTMLPage {
 		$this->add_stylesheet('basic', 'basic.css');
 		$this->add_stylesheet('default', 'default.css');
 		$this->add_stylesheet('grid', 'unsemantic-grid-responsive.css');
+	}
+
+	/**
+	 * Adds standard scripts.
+	 * @return void
+	 */
+	private function standard_scripts() {
+		$this->add_script('http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js', true);
+		$this->add_script('bildur.js');
 	}
 
 	/**
@@ -85,7 +97,7 @@ class HTMLPage {
 	 */
 	private function add_script(
 		$script_url = '',
-		$is_external = true,
+		$is_external = false,
 		$script_content = '') {
 
 		$this->script_array[] = new \output\model\Script(
@@ -103,8 +115,9 @@ class HTMLPage {
 
 		$css = "";
 
+		//Get all stylesheets.
 		if(!empty($this->stylesheet_array)) {
-			foreach ($this->stylesheet_array as $key => $stylesheet) {
+			foreach($this->stylesheet_array as $key => $stylesheet) {
 				$css .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"".STYLESHEET_PATH."$stylesheet->filename\">\n\t\t";
 			}
 		}
@@ -126,7 +139,7 @@ class HTMLPage {
 	<head>
 		<title>{$this->page_title}</title>
 		<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">
-		$css
+		{$css}
 	</head>
 
 	<body>
@@ -148,17 +161,18 @@ class HTMLPage {
 	private function getFooter() {
 		$scripts = "";
 
+		//Get all scripts.
 		if(!empty($this->script_array)) {
-			foreach ($this->script_array as $key => $script) {
-				$scripts .= "<script type=\"text/javascript\"";
-				$scripts .= ($script->isInline) ? ">$script->content" : " src=\"$script->src\">";
-				$scripts .= "</script>\n";
+			foreach($this->script_array as $key => $script) {
+				$content = ($script->external) ? $script->content : '';
+				$src = ($script->external) ? $script->url : SCRIPT_PATH . $script->url;
+				$scripts .= "<script src=\"{$src}\">{$content}</script>\n\t\t";
 			}
 		}
 
 		return "
 		</div>
-		$scripts
+		{$scripts}
 	</body>
 </html>";
 	}

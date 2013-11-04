@@ -15,6 +15,12 @@ class Logout implements IController {
 	private $loginModel;
 
 	/**
+	 * The LoginView handles any persitent login data.
+	 * @var \login\view\Login
+	 */
+	private $loginView;
+
+	/**
 	 * This view redirects.
 	 * @var \application\view\AppView
 	 */
@@ -26,6 +32,9 @@ class Logout implements IController {
 	public function __construct() {
 		//LoginModel.
 		$this->loginModel = new \login\model\Login();
+
+		//LoginView.
+		$this->loginView = new \login\view\Login();
 
 		//AppView.
 		$this->appView = new \application\view\AppView();
@@ -40,6 +49,10 @@ class Logout implements IController {
 		if($this->loginModel->isLoggedIn()) {
 			//Log out.
 			$this->loginModel->doLogout();
+
+			//Remove any cookies that might
+			//be set.
+			$this->loginView->removeCookies();
 
 			//Redirect to front-page.
 			$this->appView->redirectToFrontPage();

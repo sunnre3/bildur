@@ -29,13 +29,13 @@ class Register extends \login\model\Login {
 	 * registration was successful.
 	 * @return void
 	 */
-	private function notifyObservers() {
+	private function notifyObservers(\user\model\User $user) {
 		//Make sure we have any observers.
 		if(count($this->observers) > 0) {
 			//Loop through them.
 			foreach($this->observers as $observer) {
 				//Call method.
-				$observer->notify();
+				$observer->notify($user);
 			}
 		}
 	}
@@ -47,7 +47,7 @@ class Register extends \login\model\Login {
 	 * @param  \register\model\Observer $observer
 	 * @return void
 	 */
-	public function registerObserver(\register\model\Observer $observer) {
+	public function registerObserver(\common\model\Observer $observer) {
 		//Add to our observer array.
 		$this->observers[] = $observer;
 	}
@@ -58,7 +58,7 @@ class Register extends \login\model\Login {
 	 * @param  \register\model\Observer $observer
 	 * @return void
 	 */
-	public function unregisterObserver(\register\model\Observer $observer) {
+	public function unregisterObserver(\common\model\Observer $observer) {
 		//Loop through all observers.
 		foreach($this->observers as $key => $obs) {
 			//If current iteration is the same as
@@ -84,9 +84,9 @@ class Register extends \login\model\Login {
 			throw new \Exception('Register::registerUser() failed: username is already taken');
 
 		//Add our new user.
-		$this->userList->addUser($user);
+		$user = $this->userList->addUser($user);
 
 		//Notify observers.
-		$this->notifyObservers();
+		$this->notifyObservers($user);
 	}
 }

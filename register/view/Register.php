@@ -30,8 +30,11 @@ class Register extends \login\view\Login {
 
 				<p>Genom att registrera dig så kan du bli delaktig i den grymma 
 				gemenskapen som finns här på <strong>bildur</strong>! Sluta lurka och sätt ett namn 
-				på dina åsikter! Som registrerad medlem får du dessutom tillgång till 
-				att själv ladda upp bilder!<p>
+				på dina åsikter! Som registrerad medlem får du tillgång till att själv ladda upp bilder 
+				samt att kommentera alla inlägg!<p>
+
+				<p>Observera att fältet e-postadress är helt frivilligt och det enda din e-postadress kommer 
+				att användas för är att hämta din gravatar! Vi lovar att inte skicka ett enda mejl.</p>
 
 				<p>Välkommen på förhand!</p>
 
@@ -42,23 +45,36 @@ class Register extends \login\view\Login {
 					'<form method="post">
 						<fieldset>
 							<div class="form-group grid-container">
-								<label class="grid-20" for="' . parent::$USERNAME_FIELD . '">Användarnamn</label>
-								<div class="grid-80"><input type="text" name="' . parent::$USERNAME_FIELD . '"></div>
+								<label class="grid-20" for="' . parent::$USERNAME_FIELD . '">Användarnamn <span class="required">*</span></label>
+								<div class="grid-80">
+									<input type="text" name="' . parent::$USERNAME_FIELD . '" id="' . parent::$USERNAME_FIELD . '">
+								</div>
 							</div>
 
 							<div class="form-group grid-container">
-								<label class="grid-20" for="' . parent::$PASSWORD_FIELD . '">Lösenord</label>
-								<div class="grid-80"><input type="password" name="' . parent::$PASSWORD_FIELD . '"></div>
+								<label class="grid-20" for="' . parent::$EMAIL_FIELD . '">Email</label>
+								<div class="grid-80">
+									<input type="text" name="' . parent::$EMAIL_FIELD . '" id="' . parent::$EMAIL_FIELD . '">
+								</div>
 							</div>
 
 							<div class="form-group grid-container">
-								<label class="grid-20" for="' . parent::$REPEAT_PASSWORD_FIELD . '">Upprepa lösenord</label>
-								<div class="grid-80"><input type="password" name="' . parent::$REPEAT_PASSWORD_FIELD . '"></div>
+								<label class="grid-20" for="' . parent::$PASSWORD_FIELD . '">Lösenord <span class="required">*</span></label>
+								<div class="grid-80">
+									<input type="password" name="' . parent::$PASSWORD_FIELD . '" id="' . parent::$PASSWORD_FIELD . '">
+								</div>
+							</div>
+
+							<div class="form-group grid-container">
+								<label class="grid-20" for="' . parent::$REPEAT_PASSWORD_FIELD . '">Upprepa lösenord <span class="required">*</span></label>
+								<div class="grid-80">
+									<input type="password" name="' . parent::$REPEAT_PASSWORD_FIELD . '" id="' . parent::$REPEAT_PASSWORD_FIELD . '">
+								</div>
 							</div>
 
 							<div class="form-group grid-container">
 								<div class="grid-80 prefix-20">
-									<input type="submit" value="Registrera mig!" class="btn btn-blue" name="' . parent::$SUBMIT_BUTTON . '">
+									<input type="submit" value="Registrera mig" class="btn btn-blue" name="' . parent::$SUBMIT_BUTTON . '">
 								</div>
 							</div>
 						</fieldset>
@@ -117,5 +133,41 @@ class Register extends \login\view\Login {
 		//If it's none of the above then the username is already taken.
 		if(!$input_error)
 			$this->addErrorMessage(self::$ERROR_USERNAME_TAKEN);
+	}
+
+	/**
+	 * Private helper method for getting
+	 * the email from $_POST.
+	 * @return string
+	 */
+	private function getEmail() {
+		if(isset($_POST[parent::$EMAIL_FIELD]))
+			return $_POST[parent::$EMAIL_FIELD];
+
+		return "";
+	}
+
+	/**
+	 * Private helper method for getting
+	 * the repeated password from $_POST.
+	 * @return string password
+	 */
+	private function getRepeatedPassword() {
+		if(isset($_POST[parent::$REPEAT_PASSWORD_FIELD]))
+			return $_POST[parent::$REPEAT_PASSWORD_FIELD];
+
+		return "";
+	}
+
+	/**
+	 * Returns a User object based on
+	 * user input.
+	 * @return \user\model\User
+	 */
+	public function getUser() {
+		return \user\model\User::__new($this->getUsername(),
+									   $this->getEmail(),
+									   $this->getPassword(),
+									   $this->getRepeatedPassword());
 	}
 }

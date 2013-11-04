@@ -8,11 +8,11 @@ require_once('./user/model/User.php');
 class Setup extends Base {
 	private static $DEFAULT_ADMIN_USERNAME = 'admin';
 	private static $DEFAULT_ADMIN_PASSWORD = 'admin';
+	private static $DEFAULT_ADMIN_EMAIL = 'sunnre3@gmail.com';
 
 	public function clear() {
-		$this->executeQuery('drop table post;');
-		$this->executeQuery('drop table image;');
-		$this->executeQuery('drop table user;');
+		$this->executeQuery('drop database bildur;');
+		parent::__construct();
 	}
 
 	/**
@@ -48,6 +48,8 @@ class Setup extends Base {
 					id int unsigned NOT NULL AUTO_INCREMENT,
 					username varchar(20) NOT NULL,
 					password varchar(255) NOT NULL,
+					temp_password varchar(255) NOT NULL,
+					email varchar(100) NOT NULL,
 					PRIMARY KEY (id)
 				)
 			");
@@ -76,13 +78,30 @@ class Setup extends Base {
 					post_id int unsigned NOT NULL,
 					filepath varchar(100) NOT NULL,
 					thumbnail_filepath varchar(100) NOT NULL,
-					title varchar(100),
-					caption varchar(300),
 					PRIMARY KEY (id),
-					FOREIGN KEY (post_id) REFERENCES post(id)
+					FOREIGN KEY (post_id) REFERENCES post (id)
 						ON UPDATE CASCADE
 						ON DELETE CASCADE
 
+				)
+			");
+
+			//Add our comment table.
+			$this->executeQuery("
+				CREATE TABLE IF NOT EXISTS " . parent::$COMMENT_TABLE_NAME . "
+				(
+					id int unsigned NOT NULL AUTO_INCREMENT,
+					post_id int unsigned NOT NULL,
+					user_id int unsigned NOT NULL,
+					datetime datetime NOT NULL,
+					content text NOT NULL,
+					PRIMARY KEY (id),
+					FOREIGN KEY (post_id) REFERENCES post (id)
+						ON UPDATE CASCADE
+						ON DELETE CASCADE,
+					FOREIGN KEY (user_id) REFERENCES user (id)
+						ON UPDATE CASCADE
+						ON DELETE CASCADE
 				)
 			");
 		}
@@ -102,8 +121,9 @@ class Setup extends Base {
 			//NOTE: This is where we might get password from front-end installer ui.
 
 			//Initiate User object.
-			$user = \user\model\User::cleartext(
+			$user = \user\model\User::__new(
 				self::$DEFAULT_ADMIN_USERNAME,
+				self::$DEFAULT_ADMIN_EMAIL,
 				self::$DEFAULT_ADMIN_PASSWORD);
 
 			//Get DB connection.
@@ -111,8 +131,8 @@ class Setup extends Base {
 
 			//Add admin to user table.
 			$this->executeQuery("
-				INSERT INTO " . parent::$USER_TABLE_NAME . " (username, password)
-				VALUES ('{$user->getUsername()}','{$user->getPassword()}')
+				INSERT INTO " . parent::$USER_TABLE_NAME . " (username, password, temp_password, email)
+				VALUES ('{$user->getUsername()}','{$user->getPassword()}', '{$user->getTmpPassword()}', '{$user->getEmail()}')
 			", $mysqli);
 
 			//Set userID.
@@ -151,8 +171,14 @@ class Setup extends Base {
 
 				//Then one image attached to it.
 				 $this->executeQuery("
-				 	INSERT into " . parent::$IMAGE_TABLE_NAME . " (post_id, filepath, thumbnail_filepath, title, caption)
-				 	VALUES ({$i}, '" . UPLOAD_PATH . "exempelbild.png', '" . UPLOAD_PATH . "exempelbild.png', 'En bildtitel', 'En bildtext')
+				 	INSERT into " . parent::$IMAGE_TABLE_NAME . " (post_id, filepath, thumbnail_filepath)
+				 	VALUES ({$i}, '" . UPLOAD_PATH . "exempelbild.png', '" . UPLOAD_PATH . "exempelbild.png')
+				 ");
+
+				 //And add one comment to each.
+				 $this->executeQuery("
+				 	INSERT into " . parent::$COMMENT_TABLE_NAME . " (post_id, user_id, datetime, content)
+				 	VALUES ({$i}, {$adminID}, '{$time}', 'En testkommentar!')
 				 ");
 			}
 		}

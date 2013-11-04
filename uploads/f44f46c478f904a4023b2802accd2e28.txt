@@ -1,7 +1,0 @@
-<^>!F1::
-  Run, mmsys.cpl
-return
-
-<^>!F2::
-  Run, magnify.exe
-return

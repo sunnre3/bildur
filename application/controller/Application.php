@@ -7,29 +7,39 @@ require_once('./application/controller/Router.php');
 require_once('./output/model/Stylesheet.php');
 require_once('./output/model/Script.php');
 require_once('./output/view/HTMLPage.php');
+require_once('./application/controller/Session.php');
 
 class Application {
 	/**
-	 * @var \application\model\Setup
+	 * @var \application\model\Setup.
 	 */
 	private $setup;
 
 	/**
-	 * @var \application\model\Router
+	 * @var \application\model\Router.
 	 */
 	private $router;
 
 	/**
-	 * @var \common\view\HTMLPage
+	 * Application specifik class for session.
+	 * @var \application\controller\Session
+	 */
+	private $session;
+
+	/**
+	 * @var \common\view\HTMLPage.
 	 */
 	private $htmlPage;
 
 	/**
-	 * Creates objects
+	 * Creates objects.
 	 */
 	public function __construct() {
 		//Create a Setup object
 		$this->setup = new \application\model\Setup();
+
+		//Initiate $session.
+		$this->session = new \application\controller\Session();
 	}
 
 	/**
@@ -61,10 +71,12 @@ class Application {
 		//$this->setup->clearDB();
 
 		//First check if everyone is set up.
-		if(!$this->setup->isSetUp()) {
+		if(!$this->setup->isSetUp())
 			//If it isn't, make sure it is.
 			$this->setup->setup();
-		}
+
+		//Start a session.
+		$this->session->start();
 
 		//Create a Router object
 		$this->router = new \application\model\Router();

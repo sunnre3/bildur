@@ -17,14 +17,11 @@ class Image {
 		foreach($images as $key => $image) {
 			$id = $image->getId();
 			$filepath = $image->getFilePath();
-			$title = $image->getTitle();
-			$caption = $image->getCaption();
 
 			$html .= '
 				<div class="post-image clearfix">
-					<a href="' . ROUTER_PREFIX . ROUTER_SINGLE_IMAGE . '=' . $id . '" title="' . $title . '">
-						<img src="' . $filepath . '" alt="' . $caption . '">
-						<small>' . $caption . '</small>
+					<a href="' . $filepath . '">
+						<img src="' . $filepath . '" alt="">
 					</a>
 				</div>
 		';

@@ -75,8 +75,8 @@ class ImageModel {
 		$thumbnail = $this->generateThumbnail(UPLOAD_PATH . $filename);
 
 		//Return the filename.
-		return \image\model\Image::uploaded(UPLOAD_PATH . $filename,
-											UPLOAD_PATH . $thumbnail);
+		return \image\model\Image::__new(UPLOAD_PATH . $filename,
+										 UPLOAD_PATH . $thumbnail);
 	}
 
 	/**

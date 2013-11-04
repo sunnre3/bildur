@@ -28,9 +28,7 @@ class ImageDAL extends \database\model\Base {
 			return new \image\model\Image($obj['id'],
 										  $obj['post_id'],
 										  $obj['filepath'],
-										  $obj['thumbnail_filepath'],
-										  $obj['title'],
-										  $obj['caption']);
+										  $obj['thumbnail_filepath']);
 		}
 
 		catch(\Exception $e) {
@@ -61,9 +59,7 @@ class ImageDAL extends \database\model\Base {
 				$images[] = new \image\model\Image($obj['id'],
 												   $obj['post_id'],
 												   $obj['filepath'],
-												   $obj['thumbnail_filepath'],
-												   $obj['title'],
-												   $obj['caption']);
+												   $obj['thumbnail_filepath']);
 			
 			}
 
@@ -83,8 +79,8 @@ class ImageDAL extends \database\model\Base {
 	 */
 	public function addImage(\image\model\Image $image) {
 		//MySQL query.
-		$query = 'INSERT INTO ' . parent::$IMAGE_TABLE_NAME . ' (post_id, filepath, thumbnail_filepath, title, caption) 
-		VALUES(\'' . $image->getPostId() . '\', \'' . $image->getFilePath() . '\', \'' . $image->getThumbnail() . '\', \'' . $image->getTitle() . '\', \'' . $image->getCaption() . '\')';
+		$query = "INSERT INTO " . parent::$IMAGE_TABLE_NAME . " (post_id, filepath, thumbnail_filepath) 
+		VALUES({$image->getPostId()}, '{$image->getFilePath()}', '{$image->getThumbnail() }')";
 
 		//Execute.
 		$result = $this->executeQuery($query);

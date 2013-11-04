@@ -40,8 +40,8 @@ class Username {
 	 * @param  \user\model\username $username
 	 * @return boolean
 	 */
-	public function verify(\user\model\Username $username) {
-		return strtolower($this->username) == strtolower($username->username);
+	public function verify(\user\model\Username $other) {
+		return strtolower($this->username) == strtolower($other->username);
 	}
 
 	/**

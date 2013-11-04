@@ -5,9 +5,7 @@ ini_set('display_errors', 1);
 ini_set('html_errors', 1);
 
 function debug($item) {
-	echo '<pre>';
 	var_dump($item);
-	echo '</pre>';
 }
 
 /**
@@ -29,7 +27,8 @@ function debug($item) {
  */
 
 define('BASE_PATH', realpath(dirname(__FILE__)) . '/' , true);
-define('STYLESHEET_PATH', 'output/' . 'stylesheet/');
+define('STYLESHEET_PATH', 'output/' . 'stylesheets/');
+define('SCRIPT_PATH', 'output/' . 'scripts/');
 define('UPLOAD_PATH', 'uploads/');
 
 //Set default timezone.
@@ -38,8 +37,6 @@ date_default_timezone_set('Europe/Stockholm');
 require_once('./database/config.php');
 require_once('./application/default_router_values.php');
 require_once('./application/controller/Application.php');
-
-session_start();
 
 $appController = new \application\controller\Application();
 $appController->runApp();

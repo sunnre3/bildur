@@ -5,6 +5,7 @@ namespace application\model;
 require_once('./application/view/AppView.php');
 require_once('./output/controller/NewPost.php');
 require_once('./output/controller/EditPost.php');
+require_once('./output/controller/DeletePost.php');
 require_once('./output/controller/Login.php');
 require_once('./output/controller/Logout.php');
 require_once('./output/controller/Register.php');
@@ -36,6 +37,10 @@ class Router {
 
 			case ROUTER_EDIT_POST:
 				return new \output\controller\EditPost();
+				break;
+
+			case ROUTER_DELETE_POST:
+				return new \output\controller\DeletePost();
 				break;
 
 			case ROUTER_LOGIN:

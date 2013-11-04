@@ -4,8 +4,10 @@ namespace output\controller;
 
 require_once('./output/controller/IController.php');
 require_once('./user/model/UserDAL.php');
-require_once('./register/view/Register.php');
 require_once('./register/model/Register.php');
+require_once('./login/model/Login.php');
+require_once('./register/view/Register.php');
+require_once('./application/view/AppView.php');
 
 class Register implements IController {
 	/**
@@ -13,7 +15,7 @@ class Register implements IController {
 	 * registration process.
 	 * @var [type]
 	 */
-	private $model;
+	private $registerModel;
 
 	/**
 	 * A RegisterView to show form
@@ -23,17 +25,27 @@ class Register implements IController {
 	 * our model.
 	 * @var \register\view\Register
 	 */
-	private $view;
+	private $registerView;
+
+	/**
+	 * An AppView can do things
+	 * as redirecting.
+	 * @var \application\view\AppView
+	 */
+	private $appView;
 
 	/**
 	 * Initiates objects.
 	 */
 	public function __construct() {
 		//RegisterModel.
-		$this->model = new \register\model\Register();
+		$this->registerModel = new \register\model\Register();
 		
 		//RegisterView.
-		$this->view = new \register\view\Register();
+		$this->registerView = new \register\view\Register();
+
+		//AppView.
+		$this->appView = new \application\view\AppView();
 	}
 
 	/**
@@ -44,19 +56,36 @@ class Register implements IController {
 	public function run() {
 		//If the user just submitted his
 		//credentials.
-		if($this->view->isPOSTSubmit()) {
+		if($this->registerView->isPOSTSubmit()) {
 			try {
 				//Get the user from our view.
-				$user = $this->view->getUser();
+				$user = $this->registerView->getUser();
+
+				/** 
+				 * Register a LoginModel as an observer
+				 * to the RegisterModel so when a user
+				 * successfuly registers he will be automtically
+				 * logged in.
+				**/
+
+				//First create a loginModel.
+				$loginModel = new \login\model\Login();
+
+				//Then register it.
+				$this->registerModel->registerObserver($loginModel);
+				
 
 				//Send them to the model class to be saved.
-				$this->model->registerUser($user);
+				$this->registerModel->registerUser($user);
+
+				//When we are done, redirect user to the
+				//front page.
+				$this->appView->redirectToFrontPage();
 			}
 
 			catch(\Exception $e) {
 				//Call registerFailure() on our view.
-				$this->view->registerFailure();
-				//throw $e;
+				$this->registerView->registerFailure();
 			}
 		}
 	}
@@ -66,6 +95,6 @@ class Register implements IController {
 	 * @return string HTML
 	 */
 	public function getContent() {
-		return $this->view->getRegisterForm();
+		return $this->registerView->getRegisterForm();
 	}
 }

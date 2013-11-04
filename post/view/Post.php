@@ -3,19 +3,28 @@
 namespace post\view;
 
 require_once('./common/view/BasicView.php');
-require_once('./post/model/Post.php');
-require_once('./image/model/ImageDAL.php');
-require_once('./image/view/Image.php');
 require_once('./login/model/Login.php');
+require_once('./image/model/ImageDAL.php');
 require_once('./user/model/UserDAL.php');
+require_once('./image/view/Image.php');
+require_once('./comment/view/Comment.php');
+require_once('./post/model/Post.php');
 
 class Post extends \common\view\BasicView {
-	private static $GET_POSTID_INDEX = ROUTER_SINGLE_POST;
-
 	private static $ERROR_MISSING_TITLE = 'Du måste ange en titel.';
 	private static $ERROR_BAD_UPLOAD = 'Du kan bara ladda upp filer som slutar på 
 										antingen .jpeg, .jpg, .gif eller .png';
 
+	private static $ERROR_MISSING_COMMENTBODY = 'En kommentar får inte vara tom.';
+	private static $ERROR_COMMENT_MISC = 'Något gick fel. Testa igen och kontakta systemadmin
+										  om problemet kvarstår.';
+
+	/**
+	 * LoginModel to get the logged in user etc.
+	 * @var \login\model\Login
+	 */
+	private $loginModel;
+	
 	/**
 	 * DAL class for fetching images
 	 * @var \image\model\ImageDAL
@@ -23,27 +32,43 @@ class Post extends \common\view\BasicView {
 	private $imageDAL;
 
 	/**
+	 * DAL class for fetching the user
+	 * @var \user\model\UserDAL
+	 */
+	private $userDAL;
+
+	/**
+	 * ImageView to get the HTML for
+	 * images.
+	 * @var \image\view\Image
+	 */
+	private $imageView;
+
+	/**
+	 * CommentView to get the HTML
+	 * for comments.
+	 * @var \comment\view\Comment
+	 */
+	private $commentView;
+
+	/**
 	 * Initiates objects.
 	 */
 	public function __construct() {
-		//Get an ImageDAL object.
+		//LoginModel.
+		$this->loginModel = new \login\model\Login();
+
+		//ImageDAL.
 		$this->imageDAL = new \image\model\ImageDAL();
-	}
 
-	/**
-	 * Public function to retrieve the post ID
-	 * from the query string.
-	 * @return int
-	 */
-	public function getPostId() {
-		//If no id is set in the $_GET array; throw.
-		if(!isset($_GET[self::$GET_POSTID_INDEX]))
-			throw new \Exception('Post::getPostId() failed: no id was found');
+		//UserDAL.
+		$this->userDAL = new \user\model\UserDAL();
 
-		elseif(!is_numeric($_GET[self::$GET_POSTID_INDEX]))
-			throw new \Exception('Post::getPostId() failed: value is not numeric');
+		//ImageView.
+		$this->imageView = new \image\view\Image();
 
-		return intval($_GET[self::$GET_POSTID_INDEX]);
+		//CommentView.
+		$this->commentView = new \comment\view\Comment();
 	}
 
 	/**
@@ -115,13 +140,13 @@ class Post extends \common\view\BasicView {
 
 						<div class="form-group">
 							<label for="' . parent::$IMAGE_UPLOADER . '">Ladda upp bild</label>
-							<input type="file" name="' . parent::$IMAGE_UPLOADER . '[]" multiple>
+							<input type="file" name="' . parent::$IMAGE_UPLOADER . '[]" id="' . parent::$IMAGE_UPLOADER . '" multiple>
 							<small>Observera att du kan välja mer än en bild!</small>
 						</div>
 
 						<div class="form-group">
 							<label for="' . parent::$CONTENT_FIELD . '">Brödtext</label>
-							<textarea name="' . parent::$CONTENT_FIELD . '"></textarea>
+							<textarea name="' . parent::$CONTENT_FIELD . '" id="' . parent::$CONTENT_FIELD . '"></textarea>
 						</div>
 
 						<div class="form-group">
@@ -135,28 +160,51 @@ class Post extends \common\view\BasicView {
 	/**
 	 * Returns a HTML string for the form
 	 * needed to edit an existed post.
+	 * @param  \post\model\Post $post
 	 * @return string HTML
 	 */
-	public function getEditPostForm() {
+	public function getEditPostForm(\post\model\Post $post) {
 		$message = "<div class=\"grid-container errors\"><ul>{$this->message}</ul></div>";
 
-		return '';
+		//Return HTML.
+		return '
+			<article id="edit-form" class="post">
+				<header class="post-header">
+					<h1>Redigera inlägg</h1>
+				</header>
+
+				<section id="edit-form">'
+					
+					. $message .
+
+					'<form method="post" enctype="multipart/form-data">
+						<div class="form-group">
+							<label for="' . self::$TITLE_FIELD . '">Titel</label>
+							<input type="text" name="' . self::$TITLE_FIELD . '" value="' . $post->getTitle() . '">
+						</div>
+
+						<div class="form-group">
+							<label for="' . self::$CONTENT_FIELD . '">Brödtext</label>
+							<textarea name="' . self::$CONTENT_FIELD . '">' . $post->getContent() . '</textarea>
+						</div>
+
+						<div class="form-group">
+							<input type="submit" class="btn btn-green" name="' . parent::$SUBMIT_BUTTON . '" value="Spara">
+						</div>
+					</form>
+				</section>
+			</article>';
 	}
 
 	/**
 	 * Returns a HTML string for a single post.
 	 * @param  \post\model\Post $post
+	 * @param  \comment\model\Coment[] $comments
 	 * @return string HTML
 	 */
-	public function getSingle(\post\model\Post $post) {
-		//We need a LoginModel to check if the user is logged in.
-		$loginModel = new \login\model\Login();
-
-		//We need an ImageView to get our images.
-		$imageView = new \image\view\Image();
-
-		//Lastly we need a UserDAL to get our user.
-		$userDAL = new \user\model\UserDAL();
+	public function getSingle(\post\model\Post $post, $comments) {
+		//Error messages.
+		$message = "<div class=\"grid-container errors\"><ul>{$this->message}</ul></div>";
 
 		//Set up some local variables.
 		$id = $post->getId();
@@ -167,17 +215,24 @@ class Post extends \common\view\BasicView {
 		$post_images = $this->imageDAL->getImages($post);
 
 		//Get the HTML for the images.
-		$images_html = $imageView->getAll($post_images);
+		$images_html = $this->imageView->getAll($post_images);
 
 		//Get our User.
-		$user = $userDAL->getUser($post->getUserId());
+		$user = $this->userDAL->getUser($post->getUserId());
+
+		//Get the comment form.
+		$comment_form_html = $this->commentView->getCommentForm();
+
+		//Generate HTML for comments.
+		$comments_html = $this->commentView->getComments($comments);
 
 		//If the user is logged in and is
 		//the same user who created this post
 		//we should show the option to edit.
-		$user_action = ($loginModel->isLoggedIn() && $loginModel->getLoggedInUser()->compareUsername($user)) ?
+		$user_action = ($this->loginModel->isLoggedIn() && $this->loginModel->getLoggedInUser()->compareUsername($user)) ?
 			'<div id="post-menu">
 				<a href="' . ROUTER_PREFIX . ROUTER_EDIT_POST . ROUTER_INFIX  . $post->getId() . '">Redigera inlägg</a>
+				<a href="' . ROUTER_PREFIX . ROUTER_DELETE_POST . ROUTER_INFIX . $post->getId() . '">Ta bort inlägg</a>
 			</div>' : '';
 
 		return "
@@ -191,7 +246,17 @@ class Post extends \common\view\BasicView {
 				<p>{$content}</p>
 
 				{$images_html}
-			</article>";
+			</article>
+
+			<section id=\"post-comments\">
+				{$comments_html}
+			</section>
+
+			<section id=\"comment-form\">
+				{$message}
+				{$comment_form_html}
+			</section>
+			";
 	}
 
 	/**
@@ -211,12 +276,11 @@ class Post extends \common\view\BasicView {
 
 			$thumbnail = $this->imageDAL->getThumbnail($post);
 			$thumbnail_filepath = $thumbnail->getThumbnail();
-			$caption = $thumbnail->getCaption();
 
 			$html .= '
 				<div id="post-' . $id . '" class="front-page post">
 					<a href="' . ROUTER_PREFIX . ROUTER_SINGLE_POST . ROUTER_INFIX . $id . '">
-						<img src="' . $thumbnail_filepath . '" alt="' . $caption . '">
+						<img src="' . $thumbnail_filepath . '" alt="">
 					</a>
 				</div>';
 		}
@@ -233,7 +297,7 @@ class Post extends \common\view\BasicView {
 	 * error message to the user.
 	 * @return void
 	 */
-	public function newPostFailed() {
+	public function postFailed() {
 		//Check if there was a title.
 		if($this->getTitle() == "") {
 			$this->addErrorMessage(self::$ERROR_MISSING_TITLE);
@@ -243,6 +307,25 @@ class Post extends \common\view\BasicView {
 		//it was probably something wrong the uploaded file.
 		else {
 			$this->addErrorMessage(self::$ERROR_BAD_UPLOAD);
+		}
+	}
+
+	/**
+	 * When a user tries to comment and it fails
+	 * we need to show the user why.
+	 * @param  \comment\view\Comment $commentView
+	 * @return void
+	 */
+	public function newCommentFailed(\comment\view\Comment $commentView) {
+		//Check if the comment content was empty.
+		if(trim($commentView->getCommentBody()) == "") {
+			$this->addErrorMessage(self::$ERROR_MISSING_COMMENTBODY);
+		}
+
+		//If it wasn't, then it was most likely a
+		//back-end problem.
+		else {
+			$this->addErrorMessage(self::$ERROR_COMMENT_MISC);
 		}
 	}
 

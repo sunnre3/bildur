@@ -53,6 +53,9 @@ class Login implements IController {
 				//Get the User object from the view.
 				$user = $this->view->getUser();
 
+				//Register loginView as observer.
+				$this->model->registerObserver($this->view);
+
 				//Try login with the model.
 				$this->model->doLogin($user);
 

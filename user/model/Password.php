@@ -24,7 +24,7 @@ class Password {
 	 * This constructor takes an encrypted password.
 	 * @param string $encrypted_password
 	 */
-	public static function encrypted($encrypted_password) {
+	public static function __enc($encrypted_password) {
 		//Create an instance.
 		$instance = new self();
 
@@ -41,7 +41,7 @@ class Password {
 	 * @param  string $password cleartext
 	 * @return \user\model\Password
 	 */
-	public static function cleartext($password) {
+	public static function __new($password) {
 		//If the password isn't valid, throw.
 		if(!self::validate($password))
 			throw new \Exception('Password::fromText() failed: invalid password');
@@ -74,17 +74,8 @@ class Password {
 	 * @param  \user\model\Password $password
 	 * @return boolean
 	 */
-	public function verify(\user\model\Password $password) {
-		return password_verify($password->cleartext, $this->password);
-	}
-
-	/**
-	 * Verifies two hashes against each other
-	 * @param  \user\model\Password $password
-	 * @return boolean
-	 */
-	public function verifyEncrypted(\user\model\Password $password) {
-		return $this->password == $password->password;
+	public function verify(\user\model\Password $other) {
+		return password_verify($other->cleartext, $this->password);
 	}
 
 	/**

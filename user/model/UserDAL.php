@@ -17,9 +17,11 @@ class UserDAL extends \database\model\Base {
 		$obj = $result->fetch_array(MYSQLI_ASSOC);
 
 		//Return.
-		return \user\model\User::encrypted($obj['id'],
-										   $obj['username'],
-										   $obj['password']);
+		return \user\model\User::__enc($obj['id'],
+									   $obj['username'],
+									   $obj['password'],
+									   $obj['temp_password'],
+									   $obj['email']);
 	}
 
 	/**
@@ -39,9 +41,11 @@ class UserDAL extends \database\model\Base {
 
 		//Loop through result to create objects.
 		while($obj = $result->fetch_array(MYSQLI_ASSOC)) {
-			$users[] = \user\model\User::encrypted($obj['id'],
-												   $obj['username'],
-												   $obj['password']);
+			$users[] = \user\model\User::__enc($obj['id'],
+											   $obj['username'],
+											   $obj['password'],
+									   		   $obj['temp_password'],
+											   $obj['email']);
 		}
 		
 		//Return the array.
@@ -52,12 +56,37 @@ class UserDAL extends \database\model\Base {
 	 * With queries and a given User object we
 	 * can with this method add a new to our database.
 	 * @param  \user\model\User $user
-	 * @return void
+	 * @return \user\model\User
 	 */
 	public function addUser(\user\model\User $user) {
+		//Get a db connection.
+		$db = $this->getDBObject();
+
 		//MySQL query.
-		$query  = 'INSERT INTO ' . parent::$USER_TABLE_NAME . ' (username, password) 
-		VALUES(\'' . $user->getUsername() . '\', \'' . $user->getPassword() . '\')';
+		$query  = "INSERT INTO " . parent::$USER_TABLE_NAME . " (username, password, temp_password, email) 
+		VALUES('{$user->getUsername()}', '{$user->getPassword()}', '{$user->getTmpPassword()}', '{$user->getEmail()}')";
+
+		//Execute query.
+		$result = $this->executeQuery($query, $db);
+
+		//Set the userId.
+		$user->setId($db->insert_id);
+
+		//Return the user.
+		return $user;
+	}
+
+	/**
+	 * With this method we can update a
+	 * user in our database.
+	 * @param  \user\model\User $user
+	 * @return void
+	 */
+	public function updateUser(\user\model\User $user) {
+		//MySQL query.
+		$query = "UPDATE " . parent::$USER_TABLE_NAME .
+		" SET temp_password='{$user->getTmpPassword()}'
+		 WHERE id={$user->getId()}";
 
 		//Execute query.
 		$result = $this->executeQuery($query);
