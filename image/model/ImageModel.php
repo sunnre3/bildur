@@ -133,7 +133,7 @@ class ImageModel {
 		//If it comes back as false
 		//we throw an exception because
 		//something went wrong.
-		if(!rename($filepath, $new_filepath))
+		if(!move_uploaded_file($filepath, $new_filepath))
 			throw new \Exception('ImageModel::save() failed: couldn\'t save file');
 
 		//If everything went right we return the new filename.

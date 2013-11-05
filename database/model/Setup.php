@@ -10,11 +10,6 @@ class Setup extends Base {
 	private static $DEFAULT_ADMIN_PASSWORD = 'admin';
 	private static $DEFAULT_ADMIN_EMAIL = 'sunnre3@gmail.com';
 
-	public function clear() {
-		$this->executeQuery('drop database bildur;');
-		parent::__construct();
-	}
-
 	/**
 	 * To avoid misstakes this will be the method
 	 * to be run if we want to setup our database.

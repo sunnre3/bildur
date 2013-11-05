@@ -11,7 +11,7 @@
  * IS SAYING IS GOOD.
  */
 
-define('DB_HOST', '85.226.121.58');
-define('DB_USER', 'root');
-define('DB_PW', '');
-define('DB_NAME', 'rickard');
+define('DB_HOST', 'bildur-115456.mysql.binero.se');
+define('DB_USER', '115456_kt61769');
+define('DB_PW', 'GEwiSq2Qvu');
+define('DB_NAME', '115456-bildur');

@@ -13,19 +13,6 @@ abstract class Base {
 	private static $DB_CONNECT_ERROR = 'Error connecting to database';
 	private static $DB_CREATE_DATABASE_ERROR = 'Error creating database';
 
-	public function __construct() {
-		//Make sure that the database exists
-		//before anything else.
-		try {
-			$db = new \MySQLi(DB_HOST, DB_USER, DB_PW);
-			$query = 'CREATE DATABASE IF NOT EXISTS ' . DB_NAME;
-			$this->executeQuery($query, $db);
-		}
-		catch(\Exception $e) {
-			throw new \Exception(self::$DB_CREATE_DATABASE_ERROR . $db->connect_error);
-		}
-	}
-
 	public function isSetUp() {
 		//Get a db connection.
 		$db = $this->getDBObject();
