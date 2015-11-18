@@ -11,7 +11,7 @@
  * IS SAYING IS GOOD.
  */
 
-define('DB_HOST', 'bildur-115456.mysql.binero.se');
-define('DB_USER', '115456_kt61769');
-define('DB_PW', 'GEwiSq2Qvu');
-define('DB_NAME', '115456-bildur');
+define('DB_HOST', 'IP/DNS TO YOUR DATABASE');
+define('DB_USER', 'DATABASE USER');
+define('DB_PW', 'DATABASE PASSWORD');
+define('DB_NAME', 'DATABASE NAME');
